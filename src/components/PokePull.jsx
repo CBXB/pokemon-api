@@ -1,27 +1,45 @@
 import React, { useState, useEffect } from 'react'
+import axios from 'axios'
 
-const PokePull = (props) => {
-    const [pokemon, setPokemon] = useState ([]);
-    const [render, setRender] = useState (0);
+
+const PokePull = () => {
+    let [state, setState] = useState ([]);
+    let [count, setCount] = useState (0);
 
     //We use effect to consume API's
     useEffect(() => {
-        console.log("API Call")
-        fetch('https://pokeapi.co/api/v2/pokemon?limit=807')
-            .then(res => res.json())
-            .then(res => setPokemon(res.results))
-    }, [render]);
+        if (count > 0){
+            axios.get('https://pokeapi.co/api/v2/pokemon?limit=807')
+            // .then(res => res.json())
+            .then(res => {
+                state = res.data.results; 
+                setState([...state])}
+                );
+                // console.log(response);
+                console.log(state);  
 
-    const refreshPage = () => {
-        setRender(render + 1);
+        }
+    }, [count]);
+
+    const onClickHandler = () => {
+        console.log(state); 
+        // count++;
+        if(count === 0){
+            setCount(1);
+        }
+        else{
+            setCount(0);
+            setState([]);
+        }
+        console.log(count); 
     };
 
     return (
         <div>
-            <button onClick={refreshPage}>Click to reload from API</button>
+            <button onClick={onClickHandler}>{count === 0 ? "Fetch Pokemon" : "Come back!"}</button>
             <ul>
-            {pokemon.length > 0 && pokemon.map((poke, index)=>{
-                return (<div key={index}>{poke.name}</div>)
+            {state.map((item, index) => {
+                return (<div key={index}>{item.name}</div>)
             })}
 
             </ul>
